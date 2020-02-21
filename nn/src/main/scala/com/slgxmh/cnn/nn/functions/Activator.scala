@@ -16,7 +16,6 @@ trait Activator {
 
 object Activator {
   def get(t: ActivatorType): Activator = {
-    // todo
     t match {
       case SIGMOID => new Activator {
         override def output(input: DenseMatrix[Double]): DenseMatrix[Double] = {

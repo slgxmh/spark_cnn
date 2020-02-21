@@ -25,7 +25,7 @@ class ConvolutionLayer(val kernels: Int,
                        val activator: Activator,
                        val dimIn: Array[Int] = null) extends BaseLayers {
   /**
-   * todo
+   * ?= init weight
    *
    * @param conf
    * @param input dimension of input
@@ -54,7 +54,7 @@ class ConvolutionLayer(val kernels: Int,
   }
 
   /**
-   * todo
+   * ?=
    *
    * @param weight
    * @param input
@@ -66,15 +66,28 @@ class ConvolutionLayer(val kernels: Int,
     val colKernels = calcOutputShape(3)
     val reshapeArr = Array[Double](kernelRow * kernelCol * channels * rowKernels * colKernels)
     val starPos = 0
+    //padding
     input = ArrayUtils.zeroPad(input, padding)
     /* reshaping to matrix to simplify convolution to normal matrix multiplication */
     for (i <- 0 until colKernels) {
       for (r <- 0 until rowKernels) {
         for (ch <- 0 until channels) {
-          Array.copy(input)
+          // todo convolution
+          Array.copy(input.slice(0, ch).get(RangeUtils.interval(r * stride, r * stride + kernelRow),
+            RangeUtils.interval(c * stride, c * stride + kernelCol)).toArray,
+            0,
+            reshapeArr,
+            startPos,
+            kernelRow * kernelCol);
+          startPos += kernelRow * kernelCol;
         }
       }
     }
+
+    var reshaped = Tensor.create(reshapeArr, Array[int](
+      kernelRow * kernelCol * channels, rowKernels * colKernels
+    )).transpose();
+    reshaped.mmul(weight.w, gpuAccel).addiRowTensor(weight.b).reshape(kernels, rowKernels, colKernels);
   }
 
   /**
@@ -92,11 +105,38 @@ class ConvolutionLayer(val kernels: Int,
     dimOut
   }
 
-  override def activate(output: Tensor): Tensor = ???
+  override def activate(output: Tensor): Tensor = activator.output(output)
 
-  override def deriveDelta(activated: Tensor, error: Tensor): Tensor = ???
+  override def deriveDelta(activated: Tensor, error: Tensor): Tensor = error.muli(activator.derivative(activated))
 
-  override def gradient(input: Tensor, error: Tensor): Weight = ???
+  override def gradient(input: Tensor, error: Tensor): Weight = {
+    val channels = dimIn(1)
+    val rowKernels = calcOutputShape(2)
+    val colKernels = calcOutputShape(3)
+    val reshapeArr = Array[Double](kernelRow * kernelCol * channels * rowKernels * colKernels)
+    val starPos = 0
+    //padding
+    input = ArrayUtils.zeroPad(input, padding)
+    /* reshaping to matrix to simplify convolution to normal matrix multiplication */
+    for (i <- 0 until colKernels) {
+      for (r <- 0 until rowKernels) {
+        for (ch <- 0 until channels) {
+          Array.copy(input.slice(0, ch).get(RangeUtils.interval(r * stride, r * stride + kernelRow),
+            RangeUtils.interval(c * stride, c * stride + kernelCol)).toArray,
+            0,
+            reshapeArr,
+            startPos,
+            kernelRow * kernelCol);
+          startPos += kernelRow * kernelCol;
+        }
+      }
+    }
+
+    var reshaped = Tensor.create(reshapeArr, Array[int](
+      kernelRow * kernelCol * channels, rowKernels * colKernels
+    )).transpose();
+    reshaped.mmul(weight.w, gpuAccel).addiRowTensor(weight.b).reshape(kernels, rowKernels, colKernels);
+  }
 
   override def calculateBackprop(weight: Weight, error: Tensor): Tensor = ???
 }

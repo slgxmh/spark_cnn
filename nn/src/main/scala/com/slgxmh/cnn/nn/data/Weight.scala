@@ -9,7 +9,6 @@ object Weight {
     t match {
       case CONSTANT => tensor = Tensor.ones(dimW).muli(value)
       case UNIFORM => tensor = Tensor.rand(dimW).subi(0.5f).muli(2.0f * value)
-
     }
     tensor
   }
