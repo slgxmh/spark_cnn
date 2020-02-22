@@ -144,6 +144,13 @@ class ConvolutionLayer(val kernels: Int,
 object ConvolutionLayer {
   private val log: Logger = LoggerFactory.getLogger(this.getClass)
 
+  /**
+   * create a convolutionLayer
+   *
+   * @param shape
+   * @param conf see [[LayerConf]]
+   * @return
+   */
   def newConvolutionLayer(shape: Array[Int], conf: LayerConf): ConvolutionLayer = {
     val kernels = conf.get("num_output").asInstanceOf[Int]
     val kernelRow = conf.get("kernel_row").asInstanceOf[Int]

@@ -6,20 +6,62 @@ import com.slgxmh.cnn.nn.data.{Tensor, Weight}
 trait BaseLayers {
   val dimIn: Array[Int]
 
-  // initialization
+  /**
+   * initialization
+   *
+   * @param conf
+   * @param input
+   * @return
+   */
   def createWeight(conf: LayerConf, input: Array[Int]): Weight
 
+  /**
+   *
+   * @return
+   */
   def calcOutputShape: Array[Int]
 
-  // feedForward
+  /**
+   * feedForward
+   *
+   * @param weight
+   * @param input
+   * @return
+   */
   def generateOutput(weight: Weight, input: Tensor): Tensor
 
+  /**
+   *
+   * @param output
+   * @return
+   */
   def activate(output: Tensor): Tensor
 
-  // backPropagation
-  def deriveDelta(activated: Tensor, error: Tensor): Tensor // compute delta = f'(output) * error
+  /**
+   * backPropagation
+   * compute delta = f'(output) * error
+   *
+   * @param activated
+   * @param error
+   * @return
+   */
+  def deriveDelta(activated: Tensor, error: Tensor): Tensor
 
-  def gradient(input: Tensor, error: Tensor): Weight // compute dJ/dw = input * delta
+  /**
+   * compute dJ/dw = input * delta
+   *
+   * @param input
+   * @param error
+   * @return
+   */
+  def gradient(input: Tensor, error: Tensor): Weight
 
-  def calculateBackprop(weight: Weight, error: Tensor): Tensor // compute backprop delta = transpose(w) * error
+  /**
+   * compute backprop delta = transpose(w) * error
+   *
+   * @param weight
+   * @param error
+   * @return
+   */
+  def calculateBackprop(weight: Weight, error: Tensor): Tensor
 }
