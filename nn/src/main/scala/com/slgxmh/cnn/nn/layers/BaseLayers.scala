@@ -16,6 +16,7 @@ trait BaseLayers {
   def createWeight(conf: LayerConf, input: Array[Int]): Weight
 
   /**
+   * {kernels, channels, }
    *
    * @return
    */
