@@ -34,9 +34,13 @@ class FullyConnectedLayer(val dimOut: Int,
       Weight.create(typeW, valueW, Array(dimOut)))
   }
 
-  override def calcOutputShape: Array[Int] = ???
+  override def calcOutputShape: Array[Int] = {
+    Array[Int](dimIn(0), 1, 1, dimOut)
+  }
 
-  override def generateOutput(weight: Weight, input: Tensor): Tensor = ???
+  override def generateOutput(weight: Weight, input: Tensor): Tensor = {
+    val data =
+  }
 
   override def activate(output: Tensor): Tensor = ???
 
